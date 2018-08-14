@@ -1,2 +1,2 @@
 # sqlserver2postgre
-Data migration from sql server to postgre (+postgis)
+C# Console application for data migration from SQLServer to PostgreSQL (+Postgis)

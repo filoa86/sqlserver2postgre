@@ -5,27 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using Npgsql;
+using sqlserver2postgre.Configuration;
+using sqlserver2postgre.Utils;
 
 namespace sqlserver2postgre
 {
-    class Program
+    public class Program
     {
+        
+
+        
         static void Main(string[] args)
         {
-            var SQL_SERVER = ConfigurationManager.AppSettings["SQL_SERVER_ADDRESS"];
-            var SQL_DATABASE = ConfigurationManager.AppSettings["SQL_SERVER_ADDRESS"];
-            var SQL_USERID = ConfigurationManager.AppSettings["SQL_SERVER_ADDRESS"];
-            var SQL_PASSWORD = ConfigurationManager.AppSettings["SQL_SERVER_ADDRESS"];
-            // connection string sql server
-            SqlConnection conn = new SqlConnection();
-            conn.ConnectionString =
-            "Data Source=" + SQL_SERVER +
-            ";Initial Catalog=" + SQL_DATABASE  +
-            ";User id=UserName;" + SQL_USERID +
-            ";Password=Secret" + SQL_PASSWORD + ";";
-            //conn.Open();
+            ConsoleUtils.WriteStartup();
 
-            // connection string postgresql
+            // SQL Server
+            var sqlServer = Connection.SqlConnection();
+
+            // PostgeSQL
+            var postgreSql = Connection.NpgsqlConnection();
+
+            // Avoid automatic exit 
+            Console.WriteLine(string.Empty);
+            Console.WriteLine("## Press ENTER to close application");
+            Console.ReadLine();
         }
     }
 }

@@ -26,6 +26,8 @@ namespace sqlserver2postgre
             // PostgeSQL
             var postgreSql = Connection.NpgsqlConnection();
 
+
+
             // Avoid automatic exit 
             Console.WriteLine(string.Empty);
             Console.WriteLine("## Press ENTER to close application");

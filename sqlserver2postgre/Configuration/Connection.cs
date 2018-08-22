@@ -38,6 +38,7 @@ namespace sqlserver2postgre.Configuration
             catch (Exception e)
             {
                 ConsoleUtils.WriteException("SQL Server", e.Message);
+                //throw e;
             }
             return _sqlConnection;
         }
@@ -63,6 +64,7 @@ namespace sqlserver2postgre.Configuration
             catch (Exception e)
             {
                 ConsoleUtils.WriteException("PostgreSQL", e.Message);
+                //throw e;
             }
 
             return _npgsqlConnection;

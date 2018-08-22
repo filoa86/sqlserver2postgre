@@ -21,6 +21,8 @@ namespace sqlserver2postgre.Configuration
             PgSqlUserId = ConfigurationManager.AppSettings["PG_DATABASE_USERID"];
             PgSqlPassword = ConfigurationManager.AppSettings["PG_DATABASE_PASSWORD"];
             PgSqlPort = ConfigurationManager.AppSettings["PG_CONNECTION_PORT"];
+
+            WorkDir = ConfigurationManager.AppSettings["WORK_DIR"];
         }
 
         public string MsSqlServer { get; private set; }
@@ -33,5 +35,7 @@ namespace sqlserver2postgre.Configuration
         public string PgSqlUserId { get; private set; }
         public string PgSqlPassword { get; private set; }
         public string PgSqlPort { get; private set; }
+
+        public string WorkDir { get; set; }
     }
 }

@@ -1,0 +1,11 @@
+﻿{
+  "sourceTable": {
+    "tableName": "SpatialTable",
+    "columns": [ "id", "GeomCol1" ]
+
+  },
+  "destinationTable": {
+    "tableName": "geo_line",
+    "columns": [ "id_geo_line", "geom" ]
+  }  
+}

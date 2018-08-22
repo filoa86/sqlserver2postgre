@@ -12,7 +12,7 @@ namespace sqlserver2postgre
         static void Main(string[] args)
         {
             ConsoleUtils.WriteStartup();
-
+            
             // SQL Server
             var sqlServer = Connection.SqlConnection();
 
@@ -26,40 +26,62 @@ namespace sqlserver2postgre
                 if(schemas != null && schemas.Count() > 0)
                 {
                     var queries = Migration.BuildQuery(schemas);
-
-                    var sqlCommand = sqlServer.CreateCommand();
-                    sqlCommand.CommandText = queries[0].Source;
-                    SqlDataReader reader = sqlCommand.ExecuteReader();
-                    try
+                    var insertQuery = string.Empty;
+                    foreach (var query in queries)
                     {
-                        while (reader.Read())
+                        var rowToMigrate = 0;
+                        var sqlCommand = sqlServer.CreateCommand();
+                        sqlCommand.CommandText = query.Source;
+                        SqlDataReader reader = sqlCommand.ExecuteReader();
+                        try
                         {
-                            var fields = reader.VisibleFieldCount;
-                            for (int i = 0; i < fields; i++) // all rows
+                            while (reader.Read())
                             {
-                                var dataType = reader.GetDataTypeName(i);
-                                // TODO: add coverage for all types
-                                switch (dataType)
+                                rowToMigrate++;
+                                var fields = reader.VisibleFieldCount;
+                                var tmpQuery = query.Destination;
+                                for (int i = 0; i < fields; i++) // all rows
                                 {
-                                    case "int":
-                                        Console.WriteLine(dataType);
-                                        break;
-                                    case "mssqlsource.sys.geometry":
-                                        Console.WriteLine(dataType);
-                                        break;
-                                    default:
-                                        throw new NotSupportedException("Please implement unsupported type: " + dataType);                                        
-                                }                                
+                                    var dataType = reader.GetDataTypeName(i);
+                                    // TODO: add coverage for all data types
+                                    switch (dataType)
+                                    {
+                                        case "int":
+                                            tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), reader.GetInt32(i).ToString());
+                                            break;
+                                        case "mssqlsource.sys.geometry":
+                                            var geom = SqlGeometry.Deserialize(reader.GetSqlBytes(i));
+                                            tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), "ST_GeomFromText('" + geom.ToString() + "')");
+                                            break;
+                                        default:
+                                            throw new NotSupportedException("Please implement unsupported type: " + dataType);
+                                    }
+                                }
+                                insertQuery += tmpQuery;
                             }
-                            //SqlGeometry g = SqlGeometry.Deserialize(reader.GetSqlBytes(1));
-                            //Console.WriteLine(String.Format("{0}, {1}, {2}", reader["id"].ToString(), g.ToString(), reader.GetType()));
                         }
-                    }
-                    finally
-                    {
-                        // Always call Close when done reading.
-                        reader.Close();
-                    }
+                        finally
+                        {
+                            // Always call Close when done reading.
+                            reader.Close();
+                        }
+
+                        Console.Write("Executing data migration...");
+                        try
+                        {
+                            var pgCommand = postgreSql.CreateCommand();
+                            pgCommand.CommandText = insertQuery;
+                            var affectedRows = pgCommand.ExecuteNonQuery();
+                            if (affectedRows == rowToMigrate)
+                                Console.WriteLine("SUCCESS: written " + affectedRows + " of " + rowToMigrate + " rows");
+                            else
+                                Console.WriteLine("ERROR: written " + affectedRows + " of " + rowToMigrate + " rows");
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("ERROR: " + e.Message);
+                        }
+                    }                                        
                 }
             }
 

@@ -38,7 +38,7 @@ namespace sqlserver2postgre.Configuration
                 // destination
                 var destinationQuery = string.Empty;
                 destinationQuery = "INSERT INTO " + schema.Destination.Name + " (" + string.Join(",", schema.Destination.Columns) + ") " +
-                                   "VALUES (" + string.Join(",", schema.Source.Columns) + ")";
+                                   "VALUES (#" + string.Join(",#", schema.Source.Columns) + "); ";
 
                 // migration
                 result.Add(new MigrationQuery()

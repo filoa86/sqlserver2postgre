@@ -37,7 +37,11 @@ namespace sqlserver2postgre.Configuration
 
                 // destination
                 var destinationQuery = string.Empty;
-                destinationQuery = "INSERT INTO " + schema.Destination.Name + " (" + string.Join(",", schema.Destination.Columns) + ") " +
+                if (schema.Destination.TruncateBeforeInsert)
+                {
+                    destinationQuery = "TRUNCATE TABLE " + schema.Destination.Name + "; ";
+                }
+                destinationQuery += "INSERT INTO " + schema.Destination.Name + " (" + string.Join(",", schema.Destination.Columns) + ") " +
                                    "VALUES (#" + string.Join(",#", schema.Source.Columns) + "); ";
 
                 // migration

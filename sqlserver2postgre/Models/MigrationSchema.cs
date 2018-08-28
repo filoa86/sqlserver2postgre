@@ -13,6 +13,6 @@ namespace sqlserver2postgre.Models
         public Table Source { get; set; }
 
         [JsonProperty("destinationTable")]
-        public Table Destination { get; set; }
+        public TableDestination Destination { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using sqlserver2postgre.Configuration;
 using sqlserver2postgre.Utils;
 using Microsoft.SqlServer.Types;
+using System.Collections.Generic;
 
 namespace sqlserver2postgre
 {
@@ -26,7 +27,7 @@ namespace sqlserver2postgre
                 if(schemas != null && schemas.Count() > 0)
                 {
                     var queries = Migration.BuildQuery(schemas);
-                    var insertQuery = string.Empty;
+                    var insertQuery = new List<string>();
                     foreach (var query in queries)
                     {
                         var rowToMigrate = 0;
@@ -44,20 +45,21 @@ namespace sqlserver2postgre
                                 {
                                     var dataType = reader.GetDataTypeName(i);
                                     // TODO: add coverage for all data types
-                                    switch (dataType)
+                                    if(dataType == "int")
                                     {
-                                        case "int":
-                                            tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), reader.GetInt32(i).ToString());
-                                            break;
-                                        case "mssqlsource.sys.geometry":
-                                            var geom = SqlGeometry.Deserialize(reader.GetSqlBytes(i));
-                                            tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), "ST_GeomFromText('" + geom.ToString() + "')");
-                                            break;
-                                        default:
-                                            throw new NotSupportedException("Please implement unsupported type: " + dataType);
+                                        tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), reader.GetInt32(i).ToString());
                                     }
+                                    else if (dataType.Contains("sys.geometry"))
+                                    {
+                                        var geom = SqlGeometry.Deserialize(reader.GetSqlBytes(i));
+                                        tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), "ST_GeomFromText('" + geom.ToString() + "')");
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException("Please implement unsupported type: " + dataType);
+                                    }                                    
                                 }
-                                insertQuery += tmpQuery;
+                                insertQuery.Add(tmpQuery);
                             }
                         }
                         finally
@@ -69,9 +71,16 @@ namespace sqlserver2postgre
                         Console.Write("Executing data migration...");
                         try
                         {
+                            var affectedRows = 0;
                             var pgCommand = postgreSql.CreateCommand();
-                            pgCommand.CommandText = insertQuery;
-                            var affectedRows = pgCommand.ExecuteNonQuery();
+                            var recNr = insertQuery.Count();
+                            insertQuery.ForEach(qry =>
+                            {
+                                pgCommand.CommandText = qry;
+                                affectedRows += pgCommand.ExecuteNonQuery();
+                                Console.Write("\rMigrated rows: {0} of {1}", affectedRows, recNr);
+                            });
+                            
                             if (affectedRows == rowToMigrate)
                                 Console.WriteLine("SUCCESS: written " + affectedRows + " of " + rowToMigrate + " rows");
                             else

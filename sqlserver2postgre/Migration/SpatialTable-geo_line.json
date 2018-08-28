@@ -1,11 +1,17 @@
 ﻿{
   "sourceTable": {
     "tableName": "SpatialTable",
-    "columns": [ "id", "GeomCol1" ]
-
+    "columns": [
+      "id",
+      "GeomCol1" 
+    ]
   },
   "destinationTable": {
+    "truncateBeforeInsert": false,    
     "tableName": "geo_line",
-    "columns": [ "id_geo_line", "geom" ]
+    "columns": [
+      "id_geo_line",
+      "geom" //https://postgis.net/docs/UpdateGeometrySRID.html
+    ]
   }  
 }

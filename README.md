@@ -11,17 +11,25 @@ Configuration required in App.config:
 - CONNECTION PARAMETERS OF PG & MSSQL DATABASES
 
 Schema files are a simple json where the content describes a column mapping (Source, Destination). 
-Here an example (already included in solution):
+Here an example (already included in solution migration_config_sample.json):
 ```json
 {
   "sourceTable": {
     "tableName": "SpatialTable",
-    "columns": [ "id", "GeomCol1" ]
-
+    "columns": [
+      "id",
+      "GeomCol1"
+    ],
+    "recordLimit": 0
   },
   "destinationTable": {
+    "truncateBeforeInsert": false,    
     "tableName": "geo_line",
-    "columns": [ "id_geo_line", "geom" ]
+    "columns": [
+      "id_geo_line",
+      "geom" // https://postgis.net/docs/UpdateGeometrySRID.html
+    ],
+    "geometrySRID": 32632 // srid of geometry fields
   }  
 }
 ```

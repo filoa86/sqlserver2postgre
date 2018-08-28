@@ -13,7 +13,9 @@ namespace sqlserver2postgre
         static void Main(string[] args)
         {
             ConsoleUtils.WriteStartup();
-            
+            DateTime startTime = DateTime.Now;
+            DateTime endTime = DateTime.Now;
+
             // SQL Server
             var sqlServer = Connection.SqlConnection();
 
@@ -47,19 +49,19 @@ namespace sqlserver2postgre
                                     // TODO: add coverage for all data types
                                     if(dataType == "int")
                                     {
-                                        tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), reader.GetInt32(i).ToString());
+                                        tmpQuery.SQL = tmpQuery.SQL.Replace("#" + reader.GetName(i), reader.GetInt32(i).ToString());
                                     }
                                     else if (dataType.Contains("sys.geometry"))
                                     {
                                         var geom = SqlGeometry.Deserialize(reader.GetSqlBytes(i));
-                                        tmpQuery = tmpQuery.Replace("#" + reader.GetName(i), "ST_GeomFromText('" + geom.ToString() + "')");
+                                        tmpQuery.SQL = tmpQuery.SQL.Replace("#" + reader.GetName(i), string.Format("ST_GeomFromText('{0}',{1})", geom.ToString(), tmpQuery.GeometrySRID));
                                     }
                                     else
                                     {
                                         throw new NotSupportedException("Please implement unsupported type: " + dataType);
                                     }                                    
                                 }
-                                insertQuery.Add(tmpQuery);
+                                insertQuery.Add(tmpQuery.SQL);
                             }
                         }
                         finally
@@ -94,8 +96,11 @@ namespace sqlserver2postgre
                 }
             }
 
+            endTime = DateTime.Now;
+            TimeSpan span = endTime.Subtract(startTime);
+            Console.WriteLine("Migration time (minutes): " + span.TotalMinutes);
+
             // Avoid automatic exit 
-            Console.WriteLine(string.Empty);
             Console.WriteLine("## Press ENTER to close application");
             Console.ReadLine();
         }

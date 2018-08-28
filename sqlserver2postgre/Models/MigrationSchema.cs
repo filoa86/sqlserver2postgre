@@ -10,7 +10,7 @@ namespace sqlserver2postgre.Models
     public class MigrationSchema
     {
         [JsonProperty("sourceTable")]
-        public Table Source { get; set; }
+        public TableSource Source { get; set; }
 
         [JsonProperty("destinationTable")]
         public TableDestination Destination { get; set; }

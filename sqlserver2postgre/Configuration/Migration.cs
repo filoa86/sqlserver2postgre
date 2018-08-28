@@ -33,8 +33,11 @@ namespace sqlserver2postgre.Configuration
             {
                 // source query
                 var sourceQuery = string.Empty;
-                sourceQuery = "SELECT " + string.Join(",", schema.Source.Columns) + " FROM " + schema.Source.Name;
 
+                sourceQuery = "SELECT ";
+                if (schema.Source.RecordLimit > 0)
+                    sourceQuery += string.Format("TOP {0} ", schema.Source.RecordLimit);
+                sourceQuery += string.Join(",", schema.Source.Columns) + " FROM " + schema.Source.Name;
                 // destination
                 var destinationQuery = string.Empty;
                 if (schema.Destination.TruncateBeforeInsert)
@@ -48,7 +51,11 @@ namespace sqlserver2postgre.Configuration
                 result.Add(new MigrationQuery()
                 {
                     Source = sourceQuery,
-                    Destination = destinationQuery
+                    Destination = new Destination()
+                    {
+                        SQL = destinationQuery,
+                        GeometrySRID = schema.Destination.GeometrySRID
+                    }
                 });
             }
             return result;

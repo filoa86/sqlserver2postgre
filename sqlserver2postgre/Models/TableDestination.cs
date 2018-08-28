@@ -11,5 +11,7 @@ namespace sqlserver2postgre.Models
     {
         [JsonProperty("truncateBeforeInsert")]
         public bool TruncateBeforeInsert { get; set; }
+        [JsonProperty("geometrySRID")] 
+        public string GeometrySRID { get; set; }
     }
 }

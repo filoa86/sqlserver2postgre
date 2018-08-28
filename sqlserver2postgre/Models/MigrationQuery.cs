@@ -10,6 +10,13 @@ namespace sqlserver2postgre.Models
     {
         public string Source { get; set; }
 
-        public string Destination { get; set; }
+        public Destination Destination { get; set; }
+        
+    }
+
+    public class Destination
+    {
+        public string SQL { get; set; }
+        public string GeometrySRID { get; set; }
     }
 }

@@ -97,6 +97,7 @@
     <Compile Include="Models\MigrationSchema.cs" />
     <Compile Include="Models\Table.cs" />
     <Compile Include="Models\TableDestination.cs" />
+    <Compile Include="Models\TableSource.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
@@ -106,7 +107,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Migration\SpatialTable-geo_line.json" />
+    <None Include="Migration\migration_config_sample.json" />
     <None Include="packages.config" />
     <None Include="sqlserver2postgre_TemporaryKey.pfx" />
   </ItemGroup>

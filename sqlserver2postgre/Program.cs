@@ -5,6 +5,7 @@ using sqlserver2postgre.Configuration;
 using sqlserver2postgre.Utils;
 using Microsoft.SqlServer.Types;
 using System.Collections.Generic;
+using sqlserver2postgre.Models;
 
 namespace sqlserver2postgre
 {
@@ -42,7 +43,7 @@ namespace sqlserver2postgre
                             {
                                 rowToMigrate++;
                                 var fields = reader.VisibleFieldCount;
-                                var tmpQuery = query.Destination;
+                                var tmpQuery = (Destination)query.Destination.Clone();
                                 for (int i = 0; i < fields; i++) // all rows
                                 {
                                     var dataType = reader.GetDataTypeName(i);
@@ -61,7 +62,7 @@ namespace sqlserver2postgre
                                         throw new NotSupportedException("Please implement unsupported type: " + dataType);
                                     }                                    
                                 }
-                                insertQuery.Add(tmpQuery.SQL);
+                                insertQuery.Add(tmpQuery.SQL);                                
                             }
                         }
                         finally
@@ -84,13 +85,13 @@ namespace sqlserver2postgre
                             });
                             
                             if (affectedRows == rowToMigrate)
-                                Console.WriteLine("SUCCESS: written " + affectedRows + " of " + rowToMigrate + " rows");
+                                Console.WriteLine("\nSUCCESS: written " + affectedRows + " of " + rowToMigrate + " rows");
                             else
-                                Console.WriteLine("ERROR: written " + affectedRows + " of " + rowToMigrate + " rows");
+                                Console.WriteLine("\nERROR: written " + affectedRows + " of " + rowToMigrate + " rows");
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("ERROR: " + e.Message);
+                            Console.WriteLine("\nERROR: " + e.Message);
                         }
                     }                                        
                 }

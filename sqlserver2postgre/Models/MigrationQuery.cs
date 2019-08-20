@@ -6,17 +6,34 @@ using System.Threading.Tasks;
 
 namespace sqlserver2postgre.Models
 {
-    public class MigrationQuery
+    public class MigrationQuery : ICloneable
     {
         public string Source { get; set; }
 
         public Destination Destination { get; set; }
-        
+
+        public object Clone()
+        {
+            return new MigrationQuery()
+            {
+                Source = this.Source,
+                Destination = (Destination)this.Destination.Clone()
+            };
+        }
     }
 
-    public class Destination
+    public class Destination : ICloneable
     {
         public string SQL { get; set; }
         public string GeometrySRID { get; set; }
+
+        public object Clone()
+        {
+            return new Destination()
+            {
+                SQL = this.SQL,
+                GeometrySRID = this.GeometrySRID
+            };
+        }
     }
 }
